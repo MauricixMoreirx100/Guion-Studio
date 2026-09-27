@@ -1,0 +1,7 @@
+{
+  "name": "GuionStudio - Editor de Guiones",
+  "description": "Editor profesional de guiones cinematográficos con formato estándar en negrita para personajes y lugares de grabación, gestión de múltiples proyectos y exportación a PDF y Fountain.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+

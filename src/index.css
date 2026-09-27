@@ -1,0 +1,487 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    background-color: #F4F4F1;
+    color: #1A1A1A;
+  }
+}
+
+.font-screenplay {
+  font-family: 'Courier Prime', 'Courier New', Courier, monospace;
+  letter-spacing: 0.01em;
+}
+
+.font-editorial-serif {
+  font-family: 'Newsreader', Georgia, 'Times New Roman', serif;
+}
+
+.font-display {
+  font-family: 'Newsreader', 'Cinzel', Georgia, serif;
+}
+
+/* Custom Scrollbar for professional dark interface */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #EBEBE8;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #C4C4BF;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #9E9E98;
+}
+
+/* Screenplay standard page styling - US Letter Cinema Standard (8.5in x 11in) */
+/* Authentic Physical Screenplay Pagination & Separation (Celtx & Final Draft standard) */
+.screenplay-paper {
+  background-color: #FFFFFF;
+  color: #111111;
+  box-shadow: 0 4px 24px -2px rgba(26, 26, 26, 0.08), 0 0 0 1px #D9D9D6;
+  font-family: 'Courier Prime', 'Courier New', Courier, monospace;
+  font-size: 12pt;
+  line-height: 1.0;
+  width: 8.5in;
+  max-width: 8.5in;
+  min-height: 11in;
+  padding: 1.0in 1.0in 1.0in 1.5in; /* Hollywood screenplay standard: Left 1.5 in, Right 1.0 in, Top 1.0 in, Bottom 1.0 in */
+  box-sizing: border-box;
+  position: relative;
+  border-radius: 2px;
+}
+
+/* Strict Discrete Physical Page Container (Hard Height Cap - Never Expands Vertically) */
+.screenplay-page {
+  width: 816px !important;
+  max-width: 816px !important;
+  min-width: 816px !important;
+  height: 1056px !important;
+  max-height: 1056px !important;
+  min-height: 1056px !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+  position: relative !important;
+  border-radius: 2px;
+  margin-bottom: 2rem;
+  padding: 1.0in 1.0in 1.0in 1.5in !important; /* Standard Hollywood Margins: Left 1.5 in, Right 1.0 in, Top 1.0 in, Bottom 1.0 in */
+  font-family: 'Courier Prime', 'Courier New', Courier, monospace;
+  font-size: 12pt;
+  line-height: 1.0;
+  display: block;
+  flex-shrink: 0 !important;
+}
+
+.screenplay-page-header {
+  position: absolute;
+  top: 0.5in;
+  right: 1.0in;
+  font-family: 'Courier Prime', 'Courier New', Courier, monospace;
+  font-size: 12pt;
+  font-weight: 700;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Ensure the very first line of a page NEVER jumps or drops down unexpectedly */
+.screenplay-paper > p:first-of-type,
+.screenplay-paper > p:first-child,
+.screenplay-paper [contenteditable] > p:first-of-type,
+.screenplay-paper [contenteditable] > p:first-child,
+.screenplay-page > p:first-of-type,
+.screenplay-page > p:first-child,
+.screenplay-page > .screenplay-page-header + p,
+.screenplay-page [contenteditable] > p:first-of-type,
+.screenplay-page [contenteditable] > p:first-child,
+.screenplay-page-content > p:first-child,
+.screenplay-paper > div:first-child,
+.screenplay-paper [contenteditable] > div:first-child,
+.screenplay-page-break + p,
+.screenplay-page-break + div {
+  margin-top: 0 !important;
+}
+
+/* Screenplay Element standard indentations */
+.script-act {
+  font-weight: 700;
+  text-transform: uppercase;
+  text-align: center;
+  margin-top: 2.0em;
+  margin-bottom: 1.25em;
+  color: #000000;
+  letter-spacing: 0.1em;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+/* Scene Heading (INT./EXT.) with distinct slate highlight as requested */
+.script-scene-heading {
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-top: 1.5em;
+  margin-bottom: 0.75em;
+  color: #1E293B;
+  background-color: #F1F5F9;
+  border-left: 3px solid #64748B;
+  padding: 0.2em 0.5em;
+  border-radius: 4px;
+  letter-spacing: 0.05em;
+}
+
+.script-action {
+  font-weight: 400;
+  margin-bottom: 0.85em;
+  line-height: 1.25;
+  color: #1a1a1a;
+  max-width: 60ch;
+}
+
+.script-character {
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-top: 1.25em;
+  margin-bottom: 0.15em;
+  margin-left: 2.0in; /* Indented ~2.0-2.2 inches from left edge in standard */
+  color: #000000;
+}
+
+@media screen and (max-width: 900px) {
+  .script-character {
+    margin-left: 20%;
+  }
+}
+
+.script-parenthetical {
+  font-weight: 400;
+  font-style: italic;
+  margin-left: 1.4in;
+  margin-bottom: 0.15em;
+  max-width: 30ch;
+  color: #333333;
+}
+
+@media screen and (max-width: 900px) {
+  .script-parenthetical {
+    margin-left: 15%;
+  }
+}
+
+.script-dialogue {
+  font-weight: 400;
+  margin-left: 1.0in;
+  margin-bottom: 0.85em;
+  line-height: 1.25;
+  max-width: 35ch;
+  color: #111111;
+}
+
+@media screen and (max-width: 900px) {
+  .script-dialogue {
+    margin-left: 10%;
+    max-width: 85%;
+  }
+}
+
+.script-transition {
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-top: 1.25em;
+  margin-bottom: 1.25em;
+  text-align: right;
+  color: #000000;
+}
+
+.script-shot {
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-top: 1.25em;
+  margin-bottom: 0.5em;
+  color: #000000;
+}
+
+.script-text {
+  font-weight: 400;
+  margin-bottom: 0.85em;
+  line-height: 1.25;
+  color: #1a1a1a;
+  max-width: 60ch;
+}
+
+/* Screenplay dark mode / night mode sheet styles: Plomo oscuro (#222228) con letras blancas y negritas correspondientes */
+.screenplay-paper.dark-sheet,
+.screenplay-page.dark-sheet {
+  background-color: #222228 !important; /* Plomo oscuro elegante */
+  color: #FFFFFF !important;
+  border-color: #33333C !important;
+  box-shadow: 0 16px 40px -8px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(255, 255, 255, 0.08) !important;
+}
+
+.screenplay-paper.dark-sheet .screenplay-page-header,
+.screenplay-page.dark-sheet .screenplay-page-header,
+.screenplay-paper.dark-sheet .screenplay-page-header span,
+.screenplay-page.dark-sheet .screenplay-page-header span {
+  color: #FFFFFF !important;
+  opacity: 0.9;
+}
+
+.screenplay-paper.dark-sheet .script-act,
+.screenplay-page.dark-sheet .script-act,
+.screenplay-paper.dark-sheet .script-character,
+.screenplay-page.dark-sheet .script-character,
+.screenplay-paper.dark-sheet .script-transition,
+.screenplay-page.dark-sheet .script-transition,
+.screenplay-paper.dark-sheet .script-shot,
+.screenplay-page.dark-sheet .script-shot,
+.screenplay-paper.dark-sheet .script-scene-heading,
+.screenplay-page.dark-sheet .script-scene-heading {
+  color: #FFFFFF !important;
+  font-weight: 700 !important;
+  background-color: transparent !important;
+  border: none !important;
+}
+
+.screenplay-paper.dark-sheet .script-action,
+.screenplay-page.dark-sheet .script-action,
+.screenplay-paper.dark-sheet .script-dialogue,
+.screenplay-page.dark-sheet .script-dialogue,
+.screenplay-paper.dark-sheet .script-text,
+.screenplay-page.dark-sheet .script-text {
+  color: #FFFFFF !important;
+}
+
+.screenplay-paper.dark-sheet .script-parenthetical,
+.screenplay-page.dark-sheet .script-parenthetical {
+  color: #B0B0BA !important;
+  font-style: italic !important;
+}
+
+/* Ensure all screenplay paragraphs are strictly relative positioning contexts so placeholders and carets align */
+.screenplay-paper p,
+.screenplay-page p,
+.script-line,
+.script-act,
+.script-scene-heading,
+.script-action,
+.script-character,
+.script-dialogue,
+.script-parenthetical,
+.script-transition,
+.script-shot,
+.script-text {
+  position: relative !important;
+  white-space: pre-wrap !important;
+  word-break: break-word !important;
+}
+
+/* Screenplay Element Placeholder Watermarks: Visible ONLY when line is explicitly marked empty */
+.screenplay-paper p[data-empty="true"]::before,
+.screenplay-page p[data-empty="true"]::before {
+  content: attr(data-placeholder);
+  color: #94A3B8;
+  pointer-events: none;
+  position: absolute;
+  left: 0;
+  top: 0;
+  user-select: none;
+  opacity: 0.65;
+  font-family: 'Courier Prime', Courier, monospace;
+  font-size: 1em;
+  line-height: inherit;
+  white-space: nowrap;
+}
+
+/* Specific alignments and styles for placeholder text per element type */
+.screenplay-paper p.script-scene-heading[data-empty="true"]::before,
+.screenplay-page p.script-scene-heading[data-empty="true"]::before {
+  left: 0.5em;
+  top: 0.2em;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.screenplay-paper p.script-act[data-empty="true"]::before,
+.screenplay-page p.script-act[data-empty="true"]::before {
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.screenplay-paper p.script-transition[data-empty="true"]::before,
+.screenplay-page p.script-transition[data-empty="true"]::before {
+  left: 0;
+  right: 0;
+  text-align: right;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.screenplay-paper p.script-character[data-empty="true"]::before,
+.screenplay-page p.script-character[data-empty="true"]::before {
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.screenplay-paper p.script-parenthetical[data-empty="true"]::before,
+.screenplay-page p.script-parenthetical[data-empty="true"]::before {
+  font-style: italic;
+  color: #64748B;
+}
+
+/* Strictly hide placeholder when line has actual content or data-empty is removed */
+.screenplay-paper p:not([data-empty="true"])::before,
+.screenplay-page p:not([data-empty="true"])::before {
+  display: none !important;
+  content: none !important;
+}
+
+/* Dark mode placeholder adjustments */
+.screenplay-paper.dark-sheet p[data-empty="true"]::before,
+.screenplay-page.dark-sheet p[data-empty="true"]::before {
+  color: #7E7E8C !important;
+  opacity: 0.85 !important;
+}
+
+.screenplay-paper.dark-sheet p.script-scene-heading[data-empty="true"]::before,
+.screenplay-page.dark-sheet p.script-scene-heading[data-empty="true"]::before {
+  color: #8E8E9E !important;
+  font-weight: 700 !important;
+}
+
+.screenplay-paper.dark-sheet p.script-character[data-empty="true"]::before,
+.screenplay-page.dark-sheet p.script-character[data-empty="true"]::before {
+  color: #8E8E9E !important;
+  font-weight: 700 !important;
+}
+
+/* Print Stylesheet for clean standard screenplay output */
+/* Authentic Physical Screenplay Page Breaks (Celtx & Final Draft Multi-Page Visual Separation) */
+.screenplay-page-break {
+  position: relative;
+  display: block;
+  margin-left: -1.5in; /* Break out to full width of sheet including 1.5in left margin */
+  margin-right: -1.0in; /* Break out across 1.0in right margin */
+  padding: 0;
+  user-select: none;
+  cursor: default;
+  pointer-events: none;
+}
+
+@media screen and (max-width: 900px) {
+  .screenplay-page-break {
+    margin-left: -1.25rem;
+    margin-right: -1rem;
+  }
+}
+
+/* Bottom padding spacer of the previous page with subtle edge shadow */
+.page-break-bottom-cap {
+  width: 100%;
+  display: block;
+  box-sizing: border-box;
+  border-bottom: 1px solid #28282D;
+  box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.7);
+}
+
+.light-sheet .page-break-bottom-cap {
+  border-bottom: 1px solid #D4D4CE;
+  box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.08);
+}
+
+/* The workspace desk canvas gap between independent physical sheets */
+.page-break-gap {
+  height: 36px;
+  width: 100%;
+  background-color: #121214; /* Workspace desk background */
+  position: relative;
+}
+
+.light-sheet .page-break-gap {
+  background-color: #E5E5E0; /* Workspace desk background */
+}
+
+/* Top margin of the next page with top border, shadow, and 0.5in spacing to header */
+.page-break-top-sheet {
+  width: 100%;
+  display: block;
+  box-sizing: border-box;
+  border-top: 1px solid #28282D;
+  box-shadow: 0 -4px 16px -2px rgba(0, 0, 0, 0.6);
+  padding-top: 0.5in;
+  padding-bottom: 0.4in;
+}
+
+.light-sheet .page-break-top-sheet {
+  border-top: 1px solid #D4D4CE;
+  box-shadow: 0 -4px 16px -2px rgba(0, 0, 0, 0.06);
+}
+
+.page-break-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-left: 1.5in;
+  padding-right: 1.0in;
+  font-family: 'Courier Prime', 'Courier New', Courier, monospace;
+  font-size: 12pt;
+  color: #888888;
+}
+
+@media screen and (max-width: 900px) {
+  .page-break-header {
+    padding-left: 1.25rem;
+    padding-right: 1rem;
+  }
+}
+
+.light-sheet .page-break-header {
+  color: #555555;
+}
+
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .print-only {
+    display: block !important;
+  }
+
+  .screenplay-paper {
+    box-shadow: none !important;
+    border: none !important;
+    padding: 1in 1in 1in 1.5in !important;
+    width: 100% !important;
+    min-height: 100vh !important;
+    page-break-after: always;
+    background: transparent !important;
+  }
+
+  .screenplay-page-break {
+    margin: 0 !important;
+    padding: 0 !important;
+    page-break-after: always !important;
+    break-after: page !important;
+  }
+
+  .page-break-gap,
+  .page-break-header {
+    display: none !important;
+  }
+}
