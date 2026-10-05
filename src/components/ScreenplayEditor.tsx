@@ -668,7 +668,7 @@ export const ScreenplayEditor: React.FC<ScreenplayEditorProps> = ({
       return editorRef.current.innerText || '';
     }
     return paragraphs
-      .map((p: Element) => p.textContent || '')
+      .map((p: Element) => ((p as HTMLElement).innerText || p.textContent || '').replace(/\r\n/g, '\n'))
       .join('\n\n')
       .replace(/\n{3,}/g, '\n\n');
   }, []);
@@ -680,11 +680,14 @@ export const ScreenplayEditor: React.FC<ScreenplayEditorProps> = ({
     
     if (pageNodes.length === 0) {
       const paragraphs = Array.from(editorRef.current.querySelectorAll('p[data-type], p')) as HTMLElement[];
-      const blocks: ScriptBlock[] = paragraphs.map((p) => ({
-        id: p.getAttribute('data-block-id') || generateId(),
-        type: (p.getAttribute('data-type') as ElementType) || 'action',
-        content: (p.textContent || '').trim() === '' || isPlaceholderText(p.textContent) ? '' : (p.textContent || '').trim(),
-      }));
+      const blocks: ScriptBlock[] = paragraphs.map((p) => {
+        const text = ((p as HTMLElement).innerText || p.textContent || '').replace(/\r\n/g, '\n');
+        return {
+          id: p.getAttribute('data-block-id') || generateId(),
+          type: (p.getAttribute('data-type') as ElementType) || 'action',
+          content: text.trim() === '' || isPlaceholderText(text) ? '' : text.trim(),
+        };
+      });
       return [{ pageNumber: 1, blocks: blocks.length > 0 ? blocks : [{ id: generateId(), type: 'action', content: '' }] }];
     }
 
@@ -694,7 +697,7 @@ export const ScreenplayEditor: React.FC<ScreenplayEditorProps> = ({
       const paragraphs = Array.from(pageElem.querySelectorAll('p[data-type], p')) as HTMLElement[];
       const blocks: ScriptBlock[] = paragraphs.map((p) => {
         const type = (p.getAttribute('data-type') as ElementType) || 'action';
-        const raw = p.textContent || '';
+        const raw = ((p as HTMLElement).innerText || p.textContent || '').replace(/\r\n/g, '\n');
         const content = raw.trim() === '' || isPlaceholderText(raw) ? '' : raw.trim();
         const block: ScriptBlock = {
           id: p.getAttribute('data-block-id') || generateId(),
@@ -1654,27 +1657,28 @@ export const ScreenplayEditor: React.FC<ScreenplayEditorProps> = ({
 
     // Helper to dynamically calculate line count for a paragraph
     const getParagraphEstimatedLines = (p: HTMLElement): number => {
-      const text = (p.textContent || '').trim();
+      const text = ((p as HTMLElement).innerText || p.textContent || '').trim();
       const type = (p.getAttribute('data-type') as ElementType) || 'action';
       if (!text || text === '<br>' || isPlaceholderText(text)) {
         return 1.2;
       }
+      const lineCount = Math.max(1, text.split('\n').length);
       switch (type) {
         case 'act':
         case 'scene_heading':
-          return 2.5;
+          return 2.5 + (lineCount - 1) * 1.2;
         case 'character':
-          return 2.0;
+          return 2.0 + (lineCount - 1) * 1.2;
         case 'dialogue':
-          return Math.max(1, Math.ceil(text.length / 35)) + 0.8;
+          return Math.max(lineCount, Math.ceil(text.length / 35)) + 0.8;
         case 'parenthetical':
-          return 1.2;
+          return 1.2 + (lineCount - 1) * 1.0;
         case 'transition':
         case 'shot':
-          return 2.0;
+          return 2.0 + (lineCount - 1) * 1.2;
         case 'action':
         default:
-          return Math.max(1, Math.ceil(text.length / 60)) + 0.8;
+          return Math.max(lineCount, Math.ceil(text.length / 60)) + 0.8;
       }
     };
 
@@ -2503,8 +2507,8 @@ export const ScreenplayEditor: React.FC<ScreenplayEditorProps> = ({
 
     // 4. ENTER KEY: Screenplay Workflow Transitions & Page Spawning at Physical Boundaries
     if (e.key === 'Enter') {
-      // 4A. MANUAL NEW PAGE BREAK (Shift + Enter / Ctrl + Enter / Cmd + Enter)
-      if (e.shiftKey || e.ctrlKey || e.metaKey) {
+      // 4A. MANUAL NEW PAGE BREAK (Ctrl + Enter / Cmd + Enter ONLY)
+      if ((e.ctrlKey || e.metaKey) && !e.shiftKey) {
         e.preventDefault();
         const activeP = getActiveParagraph();
         if (activeP && editorRef.current) {
@@ -2587,7 +2591,7 @@ export const ScreenplayEditor: React.FC<ScreenplayEditorProps> = ({
 
           setActiveElementType('scene_heading');
           const pageNum = targetNextPage.getAttribute('data-page-number') || '2';
-          showNotification(`Nueva Hoja (${pageNum}) creada ✨`, e.shiftKey ? 'Shift+Enter' : 'Ctrl+Enter');
+          showNotification(`Nueva Hoja (${pageNum}) creada ✨`, 'Ctrl+Enter');
           
           setCaretInElement(newP);
           newP.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -2597,7 +2601,59 @@ export const ScreenplayEditor: React.FC<ScreenplayEditorProps> = ({
         }
       }
 
-      // 4B. Standard Enter Key in Screenplay Workflow
+      // 4B. SOFT LINE BREAK (Shift + Enter: Salto de línea sin crear nueva página)
+      if (e.shiftKey && !e.ctrlKey && !e.metaKey) {
+        e.preventDefault();
+        const selection = window.getSelection();
+        if (selection && selection.rangeCount > 0) {
+          const range = selection.getRangeAt(0);
+          range.deleteContents();
+
+          const activeP = getActiveParagraph();
+          if (activeP) {
+            activeP.removeAttribute('data-empty');
+          }
+
+          const br = document.createElement('br');
+          range.insertNode(br);
+
+          // Check if there is trailing content after br in the paragraph
+          let nextNode = br.nextSibling;
+          let hasVisibleNext = false;
+          while (nextNode) {
+            if (nextNode.nodeType === Node.TEXT_NODE && nextNode.textContent && nextNode.textContent.length > 0) {
+              hasVisibleNext = true;
+              break;
+            }
+            if (nextNode.nodeType === Node.ELEMENT_NODE && (nextNode as HTMLElement).tagName !== 'BR') {
+              hasVisibleNext = true;
+              break;
+            }
+            if (nextNode.nodeType === Node.ELEMENT_NODE && (nextNode as HTMLElement).tagName === 'BR') {
+              hasVisibleNext = true;
+              break;
+            }
+            nextNode = nextNode.nextSibling;
+          }
+
+          // In contenteditable, browser needs an extra br at the end so cursor can land on the new line
+          if (!hasVisibleNext && activeP) {
+            const trailingBr = document.createElement('br');
+            activeP.appendChild(trailingBr);
+          }
+
+          const newRange = document.createRange();
+          newRange.setStartAfter(br);
+          newRange.collapse(true);
+          selection.removeAllRanges();
+          selection.addRange(newRange);
+
+          handleInput();
+        }
+        return;
+      }
+
+      // 4C. Standard Enter Key in Screenplay Workflow
       if (!e.shiftKey && !e.ctrlKey && !e.metaKey) {
         const activeP = getActiveParagraph();
         if (activeP && editorRef.current) {
@@ -2635,12 +2691,39 @@ export const ScreenplayEditor: React.FC<ScreenplayEditorProps> = ({
             nextType = 'action';
           }
 
+          // Split paragraph if caret is in the middle of text
+          let afterText = '';
+          const sel = window.getSelection();
+          if (sel && sel.rangeCount > 0 && !isEmpty) {
+            const range = sel.getRangeAt(0);
+            if (activeP.contains(range.startContainer)) {
+              const afterRange = document.createRange();
+              afterRange.setStart(range.endContainer, range.endOffset);
+              afterRange.setEndAfter(activeP.lastChild || activeP);
+              const extracted = afterRange.extractContents();
+              afterText = (extracted.textContent || '').trim();
+            }
+          }
+
+          // If activeP became empty after splitting
+          if (isBlockContentEmpty(activeP.textContent || '')) {
+            activeP.innerHTML = '<br>';
+            activeP.setAttribute('data-empty', 'true');
+          }
+
           // Create the new paragraph with the target type
           const newP = document.createElement('p');
           const def = SCREENPLAY_ELEMENTS.find((elem) => elem.type === nextType) || SCREENPLAY_ELEMENTS[1];
           newP.setAttribute('data-type', nextType);
           newP.setAttribute('data-placeholder', ELEMENT_PLACEHOLDERS[nextType]);
-          newP.setAttribute('data-empty', 'true');
+
+          if (afterText) {
+            newP.textContent = afterText;
+            newP.removeAttribute('data-empty');
+          } else {
+            newP.innerHTML = '<br>';
+            newP.setAttribute('data-empty', 'true');
+          }
 
           const elementClassMap: Partial<Record<ElementType, string>> = {
             dialogue: `script-dialogue ${isDarkMode ? 'text-white' : 'text-[#111111]'}`,
@@ -2656,7 +2739,6 @@ export const ScreenplayEditor: React.FC<ScreenplayEditorProps> = ({
 
           const newClass = elementClassMap[nextType] || (isDarkMode ? 'script-action text-white' : 'script-action text-[#1A1A1A]');
           newP.className = `${newClass} script-line min-h-[1.5em] my-0 leading-[1.5] transition-all relative outline-none`;
-          newP.innerHTML = '<br>';
 
           // Physical Page Boundary Check: Calculate height and position of current active page container
           const activePage = activeP.closest('.screenplay-page, [data-page-container="true"]') as HTMLElement | null;
